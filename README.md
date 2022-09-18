@@ -22,6 +22,9 @@ docker create \
 chris230291/epg-monkey:latest
 ```
 
+After creating the Docker container find the web UI @ `<Docker Host IP>:<Port>`
+eg: `10.0.1.200:8087`
+
 Running the python app in Windows will not work!
 
 # Support
