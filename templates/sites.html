@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class=".container-fluid table-responsive m-lg-5">
+    <table id="table" class="table table-striped table-dark nowrap" style="display:none; width:100%">
+        <thead>
+            <tr>
+                <th>Country</th>
+                <th>Site</th>
+                <th>Channels</th>
+                <th>Enabled Channels</th>
+                <th>Edit</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for site in sites %}
+            <tr class="align-middle">
+                <td>
+                    {{ sites[site]["country"] }}
+                </td>
+                <td>
+                    {{ sites[site]["site"] }}
+                </td>
+                <td>
+                    {{ sites[site]["channels"]|length }}
+                </td>
+                <td>
+                    {{ sites[site]["enabled channels"] }}
+                </td>
+                <td>
+                    <a href='/site/{{ site }}'><button class="btn btn-success btn-block"><i
+                                class="fa fa-pencil"></i></button></a>
+                </td>
+                <td>
+                    {{ sites[site]["channels"] }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#table').DataTable({
+            order: [[3, 'des'], [0, 'asc']],
+            dom: "<'row m-1'<'col-auto'B><'col-auto ms-auto'f>>",
+            ordering: true,
+            paging: false,
+            bFilter: true,
+            bInfo: false,
+            columnDefs: [
+                { targets: 5, visible: false },
+                { targets: 4, orderable: false, searchable: false },
+            ],
+            language: {
+                search: "",
+                searchPlaceholder: 'Filter',
+                lengthMenu: "_MENU_",
+            },
+            buttons: {
+                buttons: [
+                    {
+                        text: '<i class="fa fa-refresh"></i> Update Grabbers',
+                        titleAttr: 'Update Grabbers',
+                        className: "btn btn-success",
+                        action: function (e, dt, node, config) {
+                            onclick(window.location.href = '/update/grabbers')
+                        }
+                    }
+                ]
+            },
+        });
+        $('#table').show();
+    });
+</script>
+
+{% endblock %}

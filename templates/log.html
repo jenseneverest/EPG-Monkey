@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container-fluid text-light pt-sm-5 p-lg-5 h-25">
+    <div class="p-sm-3">
+        <div class="row row-cols-auto mb-2">
+            <span class="col">Autoscroll:</span>
+            <div class="form-check form-switch col">
+                <input type="checkbox" class="checkbox form-check-input" id="autoscroll" checked>
+            </div>
+        </div>
+        <pre class="border p-3" style="height: 40pc; overflow-y: scroll;" id="logOut"></pre>
+    </div>
+</div>
+
+<script>
+    var logURL = window.location + "/stream";
+    var logOut = document.getElementById('logOut');
+    var autoscroll = document.getElementById('autoscroll');
+    setInterval(function updateLog() {
+        fetch(logURL)
+            .then(function (response) {
+                return response.text();
+            })
+            .then(function (text) {
+                logOut.textContent = text;
+                if (autoscroll.checked) {
+                    logOut.scrollTop = logOut.scrollHeight;
+                }
+            })
+        return updateLog;
+    }(), 2000);
+</script>
+
+{% endblock %}

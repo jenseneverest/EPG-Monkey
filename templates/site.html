@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+
+<form action="/site/save" method="post" id="save edits" hidden>
+    <input type="text" id="enabledEdits" name="enabledEdits" value="">
+    <input type="text" id="siteId" name="siteId" value="{{ siteId }}">
+</form>
+
+<div class=".container-fluid table-responsive m-lg-5">
+    <table id="table" class="table table-striped table-dark nowrap" style="display:none; width:100%">
+        <thead>
+            <tr>
+                <th>
+                    <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" onchange="enableAll(this)">
+                    </div>
+                </th>
+                <th>Name</th>
+                <th>Language</th>
+                <th>XMLTV ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for channel in site["channels"] %}
+            <tr class="align-middle">
+                <td style="width:0%">
+                    <div class="form-check form-switch">
+                        <input type="checkbox" class="channelCheckbox form-check-input" onchange="editEnabled(this)"
+                            data-channelId="{{ channel['xmltv_id'] }}" {{ 'checked' if channel['xmltv_id'] in enabledChannels }}>
+                    </div>
+                </td>
+                <td style="width:0%">
+                    {{ channel['name'] }}
+                </td>
+                <td style="width:0%">
+                    {{ channel['lang'] }}
+                </td>
+                <td>
+                    {{ channel['xmltv_id'] }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    /* Create an array with the values of all the checkboxes in a column */
+    $.fn.dataTable.ext.order['dom-checkbox'] = function (settings, col) {
+        return this.api().column(col, { order: 'index' }).nodes().map(function (td, i) {
+            return $('input', td).prop('checked') ? '1' : '0';
+        });
+    }
+    $(document).ready(function () {
+        var table = $('#table').DataTable({
+            order: [[0, 'des'], [1, 'asc']],
+            orderFixed: [0, 'des'],
+            paging: false,
+            ordering: true,
+            bFilter: true,
+            bInfo: false,
+            columnDefs: [
+                { targets: 0, orderable: false, orderDataType: "dom-checkbox", searchable: false },
+                { targets: 1, orderable: true }
+            ],
+            dom: "<'row m-1'<'col-auto'B><'col-auto ms-auto m-1'f>>",
+            buttons: {
+                buttons: [
+                    {
+                        text: '<i class="fa fa-save"></i> Save',
+                        titleAttr: 'Save',
+                        className: "btn btn-success",
+                        action: function () {
+                            save();
+                        }
+                    }
+                ],
+            },
+            language: {
+                search: "",
+                searchPlaceholder: 'Filter',
+                lengthMenu: "_MENU_",
+            },
+        });
+        $('#table').show();
+    });
+
+    var enabledEdits = [];
+
+    function enableAll(ele) {
+        var checkboxes = document.getElementsByClassName('channelCheckbox');
+        var enable = ele.checked;
+        for (var i = 0, n = checkboxes.length; i < n; i++) {
+            checkboxes[i].checked = enable;
+            checkboxes[i].onchange();
+        }
+    }
+
+    function editEnabled(ele) {
+        var i = ele.getAttribute('data-channelId');
+        var c = ele.checked;
+        var j = { "channel id": i, "enabled": c };
+        enabledEdits.push(j);
+    }
+
+    function save() {
+        document.getElementById("enabledEdits").value = JSON.stringify(enabledEdits);
+        document.getElementById("save edits").submit();
+    }
+</script>
+
+{% endblock %}

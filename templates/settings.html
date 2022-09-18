@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container-fluid text-light px-lg-5 pb-lg-5">
+
+    <div class="mt-3">
+        <button form="save" class="btn btn-success btn-block" title="Save"><i class="fa fa-save"></i> Save</button>
+    </div>
+    <br>
+
+    <form id="save" action="/settings/save" method="post"></form>
+    <input form="save" type="text" name="security" id="security" value="{{ settings['security'] }}" hidden>
+    <input form="save" type="text" name="updateSites" id="updateSites" value="{{ settings['update sites'] }}" hidden>
+    <input form="save" type="text" name="translateTitles" id="translateTitles"
+        value="{{ settings['translate titles'] }}" hidden>
+    <input form="save" type="text" name="translateDescriptions" id="translateDescriptions"
+        value="{{ settings['translate descriptions'] }}" hidden>
+
+
+    <h4>XMLTV</h4>
+    <hr>
+    <div class="p-sm-3">
+        <h6>Update Time:</h6>
+        <div class="col-md-1">
+            <select class="form-select" title="Update Time" form="save" id="updateHour" name="updateHour" required>
+                {% for key, value in hours.items() %}
+                <option {{ "selected" if settings['update hour']==value }} value="{{ value }}">{{ key }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <span class="text-muted">The EPG is updated daily at the selected hour</span>
+        <br>
+        <span class="text-muted">Next update: {{ nextUpdate }}</span>
+
+        <br>
+        <br>
+
+        <h6>Max Days:</h6>
+        <div class="col-md-1">
+            <select class="form-select" title="Max Days" form="save" id="daysToGrab" name="daysToGrab" required>
+                <option {{ "selected" if settings['days to grab']==1 }} value=1>1</option>
+                <option {{ "selected" if settings['days to grab']==2 }} value=2>2</option>
+                <option {{ "selected" if settings['days to grab']==3 }} value=3>3</option>
+                <option {{ "selected" if settings['days to grab']==4 }} value=4>4</option>
+                <option {{ "selected" if settings['days to grab']==5 }} value=5>5</option>
+                <option {{ "selected" if settings['days to grab']==6 }} value=6>6</option>
+                <option {{ "selected" if settings['days to grab']==7 }} value=7>7</option>
+            </select>
+        </div>
+        <span class="text-muted">The maximum number of days to grab</span>
+
+        <br>
+        <br>
+
+        <h6>Translate Titles:</h6>
+        <div class="col-md-3">
+            <div class="form-check form-switch">
+                <input type="checkbox" class="checkbox form-check-input" onchange="enable(this)"
+                    data-input="translateTitles" {{ "checked" if settings['translate titles']=='true' }}>
+            </div>
+        </div>
+
+        <br>
+
+        <h6>Translate Descriptions:</h6>
+        <div class="col-md-3">
+            <div class="col-md-3">
+                <div class="form-check form-switch">
+                    <input type="checkbox" class="checkbox form-check-input" onchange="enable(this)"
+                        data-input="translateDescriptions" {{ "checked" if settings['translate descriptions']=='true'
+                        }}>
+                </div>
+            </div>
+        </div>
+
+        <br>
+
+        <h6>Translate Language:</h6>
+        <div class="col-md-3">
+            <select class="form-select" title="Language" form="save" id="translateLanguage" name="translateLanguage"
+                required>
+                {% for key, value in languages.items() %}
+                <option {{ "selected" if settings['translate language']==value }} value="{{ value }}">{{ key }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <span class="text-muted">The target language to translate other languages to</span>
+
+        <br>
+        <br>
+
+        <h6>Translate Proxy:</h6>
+        <div class="col-md-3">
+            <div class="input-group flex-nowrap">
+                <input type="text" form="save" id="translateProxy" name="translateProxy" class="form-control flex-fill" title="Proxy" value="{{ settings['translate proxy'] }}">
+            </div>
+        </div>
+        <span class="text-muted">Using a proxy can avoid hitting Google translate limits</span>
+        <br>
+        <span class="text-muted">Translating can take a long time</span>
+
+        <br>
+        <br>
+
+        <a href='/update/xmltv'><button class="btn btn-success btn-block"><i class="fa fa-refresh"></i> Update
+                Now</button></a>
+    </div>
+
+    <br>
+
+    <h4>Security</h4>
+    <hr>
+    <div class="p-sm-3">
+        <h6>Enable:</h6>
+        <div class="form-check form-switch">
+            <input type="checkbox" class="checkbox form-check-input" onchange="enable(this)" data-input="security"
+                {{ "checked" if settings['security']=='true' }}>
+        </div>
+        <br>
+        <h6>Username:</h6>
+        <div class="col-md-3">
+            <input form="save" type="text" name="username" id="username" class="form-control"
+                value="{{ settings['username'] }}" title="Username" required>
+        </div>
+        <br>
+        <h6>Password:</h6>
+        <div class="col-md-3">
+            <input form="save" type="text" name="password" id="password" class="form-control"
+                value="{{ settings['password'] }}" title="Password" required>
+        </div>
+        <span class="text-muted">Recommended if exposed to the internet or on a public network</span>
+    </div>
+
+</div>
+
+<script>
+    function resetDefault(ele) {
+        var d = ele.getAttribute('data-default');
+        var i = ele.getAttribute('data-input');
+        document.getElementById(i).value = d;
+    }
+
+    function enable(ele) {
+        var c = ele.checked;
+        var i = ele.getAttribute('data-input');
+        document.getElementById(i).value = c;
+    }
+</script>
+
+{% endblock %}
