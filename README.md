@@ -35,3 +35,11 @@ Any grabber issues should be directed to the guys over at [iptv-org](https://git
 This is simply a GUI, scheduler, translator, combiner, server for the grabbers they maintain.
 
 [![](https://www.paypalobjects.com/en_GB/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate/?hosted_button_id=62MYXSBT75D4E)
+
+# Screenshots
+![image](https://user-images.githubusercontent.com/5328818/192340712-21187930-7681-48f5-8443-e4891f75d1c6.png)
+![image](https://user-images.githubusercontent.com/5328818/192341236-ea7f38d7-a50e-4253-be1b-e1405597d525.png)
+![image](https://user-images.githubusercontent.com/5328818/192341451-6f4d29f3-d64f-48ed-b5e2-4c2cb7585562.png)
+![image](https://user-images.githubusercontent.com/5328818/192341512-e20de1fe-ad48-4c58-aef2-f569e119a91b.png)
+
+
