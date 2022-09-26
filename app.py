@@ -1,4 +1,12 @@
-from flask import Flask, render_template, redirect, request, Response, make_response, flash
+from flask import (
+    Flask,
+    render_template,
+    redirect,
+    request,
+    Response,
+    make_response,
+    flash,
+)
 import xml.etree.cElementTree as ET
 import os
 import json
@@ -42,11 +50,144 @@ grabberDir = os.path.join(basePath, "epg-master")
 sitesDir = os.path.join(grabberDir, "sites")
 tmpDir = os.path.join(basePath, "tmp")
 
-languages = {'afrikaans': 'af', 'albanian': 'sq', 'amharic': 'am', 'arabic': 'ar', 'armenian': 'hy', 'azerbaijani': 'az', 'basque': 'eu', 'belarusian': 'be', 'bengali': 'bn', 'bosnian': 'bs', 'bulgarian': 'bg', 'catalan': 'ca', 'cebuano': 'ceb', 'chichewa': 'ny', 'chinese (simplified)': 'zh-CN', 'chinese (traditional)': 'zh-TW', 'corsican': 'co', 'croatian': 'hr', 'czech': 'cs', 'danish': 'da', 'dutch': 'nl', 'english': 'en', 'esperanto': 'eo', 'estonian': 'et', 'filipino': 'tl', 'finnish': 'fi', 'french': 'fr', 'frisian': 'fy', 'galician': 'gl', 'georgian': 'ka', 'german': 'de', 'greek': 'el', 'gujarati': 'gu', 'haitian creole': 'ht', 'hausa': 'ha', 'hawaiian': 'haw', 'hebrew': 'iw', 'hindi': 'hi', 'hmong': 'hmn', 'hungarian': 'hu', 'icelandic': 'is', 'igbo': 'ig', 'indonesian': 'id', 'irish': 'ga', 'italian': 'it', 'japanese': 'ja', 'javanese': 'jw', 'kannada': 'kn', 'kazakh': 'kk', 'khmer': 'km', 'kinyarwanda': 'rw', 'korean': 'ko', 'kurdish': 'ku',
-             'kyrgyz': 'ky', 'lao': 'lo', 'latin': 'la', 'latvian': 'lv', 'lithuanian': 'lt', 'luxembourgish': 'lb', 'macedonian': 'mk', 'malagasy': 'mg', 'malay': 'ms', 'malayalam': 'ml', 'maltese': 'mt', 'maori': 'mi', 'marathi': 'mr', 'mongolian': 'mn', 'myanmar': 'my', 'nepali': 'ne', 'norwegian': 'no', 'odia': 'or', 'pashto': 'ps', 'persian': 'fa', 'polish': 'pl', 'portuguese': 'pt', 'punjabi': 'pa', 'romanian': 'ro', 'russian': 'ru', 'samoan': 'sm', 'scots gaelic': 'gd', 'serbian': 'sr', 'sesotho': 'st', 'shona': 'sn', 'sindhi': 'sd', 'sinhala': 'si', 'slovak': 'sk', 'slovenian': 'sl', 'somali': 'so', 'spanish': 'es', 'sundanese': 'su', 'swahili': 'sw', 'swedish': 'sv', 'tajik': 'tg', 'tamil': 'ta', 'tatar': 'tt', 'telugu': 'te', 'thai': 'th', 'turkish': 'tr', 'turkmen': 'tk', 'ukrainian': 'uk', 'urdu': 'ur', 'uyghur': 'ug', 'uzbek': 'uz', 'vietnamese': 'vi', 'welsh': 'cy', 'xhosa': 'xh', 'yiddish': 'yi', 'yoruba': 'yo', 'zulu': 'zu'}
+languages = {
+    "afrikaans": "af",
+    "albanian": "sq",
+    "amharic": "am",
+    "arabic": "ar",
+    "armenian": "hy",
+    "azerbaijani": "az",
+    "basque": "eu",
+    "belarusian": "be",
+    "bengali": "bn",
+    "bosnian": "bs",
+    "bulgarian": "bg",
+    "catalan": "ca",
+    "cebuano": "ceb",
+    "chichewa": "ny",
+    "chinese (simplified)": "zh-CN",
+    "chinese (traditional)": "zh-TW",
+    "corsican": "co",
+    "croatian": "hr",
+    "czech": "cs",
+    "danish": "da",
+    "dutch": "nl",
+    "english": "en",
+    "esperanto": "eo",
+    "estonian": "et",
+    "filipino": "tl",
+    "finnish": "fi",
+    "french": "fr",
+    "frisian": "fy",
+    "galician": "gl",
+    "georgian": "ka",
+    "german": "de",
+    "greek": "el",
+    "gujarati": "gu",
+    "haitian creole": "ht",
+    "hausa": "ha",
+    "hawaiian": "haw",
+    "hebrew": "iw",
+    "hindi": "hi",
+    "hmong": "hmn",
+    "hungarian": "hu",
+    "icelandic": "is",
+    "igbo": "ig",
+    "indonesian": "id",
+    "irish": "ga",
+    "italian": "it",
+    "japanese": "ja",
+    "javanese": "jw",
+    "kannada": "kn",
+    "kazakh": "kk",
+    "khmer": "km",
+    "kinyarwanda": "rw",
+    "korean": "ko",
+    "kurdish": "ku",
+    "kyrgyz": "ky",
+    "lao": "lo",
+    "latin": "la",
+    "latvian": "lv",
+    "lithuanian": "lt",
+    "luxembourgish": "lb",
+    "macedonian": "mk",
+    "malagasy": "mg",
+    "malay": "ms",
+    "malayalam": "ml",
+    "maltese": "mt",
+    "maori": "mi",
+    "marathi": "mr",
+    "mongolian": "mn",
+    "myanmar": "my",
+    "nepali": "ne",
+    "norwegian": "no",
+    "odia": "or",
+    "pashto": "ps",
+    "persian": "fa",
+    "polish": "pl",
+    "portuguese": "pt",
+    "punjabi": "pa",
+    "romanian": "ro",
+    "russian": "ru",
+    "samoan": "sm",
+    "scots gaelic": "gd",
+    "serbian": "sr",
+    "sesotho": "st",
+    "shona": "sn",
+    "sindhi": "sd",
+    "sinhala": "si",
+    "slovak": "sk",
+    "slovenian": "sl",
+    "somali": "so",
+    "spanish": "es",
+    "sundanese": "su",
+    "swahili": "sw",
+    "swedish": "sv",
+    "tajik": "tg",
+    "tamil": "ta",
+    "tatar": "tt",
+    "telugu": "te",
+    "thai": "th",
+    "turkish": "tr",
+    "turkmen": "tk",
+    "ukrainian": "uk",
+    "urdu": "ur",
+    "uyghur": "ug",
+    "uzbek": "uz",
+    "vietnamese": "vi",
+    "welsh": "cy",
+    "xhosa": "xh",
+    "yiddish": "yi",
+    "yoruba": "yo",
+    "zulu": "zu",
+}
 
-hours = {"00:00": 0, "01:00": 1, "02:00": 2, "03:00": 3, "04:00": 4, "05:00": 5, "06:00": 6, "07:00": 7, "08:00": 8, "09:00": 9, "10:00": 10, "11:00": 11,
-         "12:00": 12, "13:00": 13, "14:00": 14, "15:00": 15, "16:00": 16, "17:00": 17, "18:00": 18, "19:00": 19, "20:00": 20, "21:00": 21, "22:00": 22, "23:00": 23}
+hours = {
+    "00:00": 0,
+    "01:00": 1,
+    "02:00": 2,
+    "03:00": 3,
+    "04:00": 4,
+    "05:00": 5,
+    "06:00": 6,
+    "07:00": 7,
+    "08:00": 8,
+    "09:00": 9,
+    "10:00": 10,
+    "11:00": 11,
+    "12:00": 12,
+    "13:00": 13,
+    "14:00": 14,
+    "15:00": 15,
+    "16:00": 16,
+    "17:00": 17,
+    "18:00": 18,
+    "19:00": 19,
+    "20:00": 20,
+    "21:00": 21,
+    "22:00": 22,
+    "23:00": 23,
+}
 
 config = {}
 
@@ -59,21 +200,34 @@ def authorise(f):
         security = settings["security"]
         username = settings["username"]
         password = settings["password"]
-        if security == "false" or auth and auth.username == username and auth.password == password:
-            return f(*args, ** kwargs)
-        return make_response('Could not verify your login!', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+        if (
+            security == "false"
+            or auth
+            and auth.username == username
+            and auth.password == password
+        ):
+            return f(*args, **kwargs)
+        return make_response(
+            "Could not verify your login!",
+            401,
+            {"WWW-Authenticate": 'Basic realm="Login Required"'},
+        )
+
     return decorated
 
 
 def updateGrabbers():
     logger.info("Updating Grabbers...")
 
-    r = requests.get(
-        'https://github.com/iptv-org/epg/archive/refs/heads/master.zip')
+    r = requests.get("https://github.com/iptv-org/epg/archive/refs/heads/master.zip")
     z = zipfile.ZipFile(io.BytesIO(r.content))
     z.extractall(basePath)
-    ret = subprocess.call(["npm", "install"], cwd=grabberDir,
-                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    ret = subprocess.call(
+        ["npm", "install"],
+        cwd=grabberDir,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
 
     if ret == 0:
         logger.info("Grabbers updated!")
@@ -86,21 +240,22 @@ def updateGrabbers():
 def getGrabbers():
     def getData(xml):
         path = xml
-        id = os.path.basename(xml).split('.channels')[0]
-        site = os.path.basename(xml).split('_')[0]
-        country = xml.split('_')[1].split('.c')[0].upper()
+        id = os.path.basename(xml).split(".channels")[0]
+        site = os.path.basename(xml).split("_")[0]
+        country = xml.split("_")[1].split(".c")[0].upper()
         channels = []
 
         tree = ET.parse(path)
         root = tree.getroot()
-        for channel in root.findall('.//channel'):
+        for channel in root.findall(".//channel"):
             name = channel.text
             lang = channel.attrib["lang"]
             xmltv_id = channel.attrib["xmltv_id"]
             channels.append({"name": name, "lang": lang, "xmltv_id": xmltv_id})
 
-        data = {id: {"path": path, "site": site,
-                "country": country, "channels": channels}}
+        data = {
+            id: {"path": path, "site": site, "country": country, "channels": channels}
+        }
 
         grabbers.update(data)
 
@@ -111,7 +266,7 @@ def getGrabbers():
 
     for r, d, f in os.walk(sitesDir):
         for file in f:
-            if '.channels.xml' in file:
+            if ".channels.xml" in file:
                 xmls.append(os.path.join(r, file))
 
     grabbers = {}
@@ -166,12 +321,14 @@ def makeXmltv():
 
                     if titleLang != translateLangauge:
                         titleTranslated = GoogleTranslator(
-                            source=titleLang, target=translateLangauge, proxies=proxies).translate(titleText)
+                            source=titleLang, target=translateLangauge, proxies=proxies
+                        ).translate(titleText)
 
                         titleTranslated = string.capwords(titleTranslated, " ")
 
-                        ET.SubElement(programme, "title", lang=translateLangauge).text = str(
-                            titleTranslated)
+                        ET.SubElement(
+                            programme, "title", lang=translateLangauge
+                        ).text = str(titleTranslated)
                 except:
                     pass
 
@@ -188,19 +345,22 @@ def makeXmltv():
 
                     if descLang != translateLangauge:
                         descTranslated = GoogleTranslator(
-                            source=descLang, target=translateLangauge, proxies=proxies).translate(descText)
+                            source=descLang, target=translateLangauge, proxies=proxies
+                        ).translate(descText)
 
-                        ET.SubElement(programme, "desc", lang=translateLangauge).text = str(
-                            descTranslated)
+                        ET.SubElement(
+                            programme, "desc", lang=translateLangauge
+                        ).text = str(descTranslated)
                 except:
                     pass
 
         siteId = site["id"]
         wantedChannels = site["wanted channels"]
+        customNames = site.get("custom names", {})
 
         for r, d, f in os.walk(sitesDir):
             for file in f:
-                if siteId + '.channels.xml' in file:
+                if siteId + ".channels.xml" in file:
                     channelsXml = os.path.join(r, file)
                     directory = os.path.dirname(os.path.join(r, file))
                     for file in os.listdir(directory):
@@ -214,18 +374,21 @@ def makeXmltv():
 
         tree = ET.parse(channelsXml)
         root = tree.getroot()
-        channels = root.find('channels')
+        channels = root.find("channels")
         langs = {}
         for elem in list(channels):
             if elem.attrib.get("xmltv_id", "") in wantedChannels:
                 xmltv_id = elem.attrib.get("xmltv_id", "")
                 lang = elem.attrib.get("lang", "")
                 langs.update({xmltv_id: lang})
+                customName = customNames.get(xmltv_id)
+                if customName:
+                    elem.text = customName
             else:
                 channels.remove(elem)
 
-        tmpChannels = os.path.join(tmpDir, siteId + '.channels.xml')
-        output = os.path.join(tmpDir, siteId + '.guide.xml')
+        tmpChannels = os.path.join(tmpDir, siteId + ".channels.xml")
+        output = os.path.join(tmpDir, siteId + ".guide.xml")
 
         tree.write(tmpChannels)
 
@@ -234,11 +397,22 @@ def makeXmltv():
             # subprocess.call(["npx", "epg-grabber", "--days=" + str(days), "--config=" + conf, "--channels=" + tmpChannels,
             #                "--output=" + output], shell=True, cwd=grabberDir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-            with subprocess.Popen(["npx", "epg-grabber", "--days=" + str(days), "--config=" + conf, "--channels=" + tmpChannels,
-                                   "--output=" + output], cwd=grabberDir, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL) as grab:
+            with subprocess.Popen(
+                [
+                    "npx",
+                    "epg-grabber",
+                    "--days=" + str(days),
+                    "--config=" + conf,
+                    "--channels=" + tmpChannels,
+                    "--output=" + output,
+                ],
+                cwd=grabberDir,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+            ) as grab:
                 for line in iter(grab.stdout.readline, ""):
                     line = line.decode("unicode-escape")
-                    if line.startswith('['):
+                    if line.startswith("["):
                         logger.info(line.rstrip())
                     if grab.poll() is not None:
                         break
@@ -249,16 +423,14 @@ def makeXmltv():
                 tree = ET.parse(os.path.join(tmpDir, output))
 
                 if translateTitles == "true" or translateDescriptions == "true":
-                    logger.info(
-                        "Translating programmes for {}...".format(siteId))
+                    logger.info("Translating programmes for {}...".format(siteId))
 
                     root = tree.getroot()
                     programmes = root.findall("programme")
                     with concurrent.futures.ThreadPoolExecutor() as executor:
                         executor.map(translateProgramme, programmes)
 
-                    logger.info(
-                        "Finished translating programmes for {}".format(siteId))
+                    logger.info("Finished translating programmes for {}".format(siteId))
 
                 return tree
 
@@ -269,16 +441,27 @@ def makeXmltv():
 
     for i in config["sites"]:
         id = i
-        wantedChannels = config["sites"][i]["enabled channels"]
+        wantedChannels = config["sites"][i].get("enabled channels", [])
+        custonNames = config["sites"][i].get("custom names", {})
         totalChannels = totalChannels + len(wantedChannels)
-        wanted.append({"id": id, "wanted channels": wantedChannels})
+        if wantedChannels:
+            wanted.append(
+                {
+                    "id": id,
+                    "wanted channels": wantedChannels,
+                    "custom names": custonNames,
+                }
+            )
 
     if len(wanted) == 0:
         logger.info("No enabled channels. XMLTV update stopping")
         return
 
     logger.info(
-        "EPG-Monkey found {} enabled channels across {} grabbers".format(totalChannels, len(wanted)))
+        "EPG-Monkey found {} enabled channels across {} grabbers".format(
+            totalChannels, len(wanted)
+        )
+    )
 
     updateGrabbers()
 
@@ -292,8 +475,15 @@ def makeXmltv():
     translateLangauge = config["settings"]["translate language"]
     translateProxy = config["settings"]["translate proxy"]
 
-    logger.info("Config: Days={} - Translate Titles={} - Translate Descriptions={} - Translation Language={} - Translation Proxy={}".format(
-        days, translateTitles, translateDescriptions, translateLangauge, translateProxy))
+    logger.info(
+        "Config: Days={} - Translate Titles={} - Translate Descriptions={} - Translation Language={} - Translation Proxy={}".format(
+            days,
+            translateTitles,
+            translateDescriptions,
+            translateLangauge,
+            translateProxy,
+        )
+    )
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         results = executor.map(grabXmltv, wanted)
@@ -348,18 +538,28 @@ def sites():
     # ID's can change so cleanup neccasary
     for site in sites:
         availableChannels = []
-        enabledChannels = config.get("sites", {}).get(
-            site, {}).get("enabled channels", [])
+        enabledChannels = (
+            config.get("sites", {}).get(site, {}).get("enabled channels", [])
+        )
+        customNames = config.get("sites", {}).get(site, {}).get("custom names", {})
         for channel in sites[site]["channels"]:
             availableChannels.append(channel["xmltv_id"])
         for channel in list(enabledChannels):
             if channel not in availableChannels:
-                logger.info("Removing {} from {} as it no longer exists".format(channel, site))
+                logger.info(
+                    "Removing {} from {} as it no longer exists".format(channel, site)
+                )
                 config["sites"][site]["enabled channels"] = list(
-                    filter((channel).__ne__, enabledChannels))
-        if len(enabledChannels) == 0:
-            if config.get("sites", {}).get(site):
-                del config["sites"][site]
+                    filter((channel).__ne__, enabledChannels)
+                )
+        for channel in list(customNames):
+            if channel not in availableChannels:
+                logger.info(
+                    "Removing {} from {} custom channel names as it no longer exists".format(
+                        channel, site
+                    )
+                )
+                customNames.pop(channel, None)
 
         sites[site]["enabled channels"] = len(enabledChannels)
 
@@ -374,50 +574,88 @@ def sites():
 def site(id):
     site = getGrabbers()[id]
     enabledChannels = config["sites"].get(id, {}).get("enabled channels", [])
+    customNames = config["sites"].get(id, {}).get("custom names", {})
 
-    return render_template("site.html", site=site, siteId=id, enabledChannels=enabledChannels)
+    return render_template(
+        "site.html",
+        site=site,
+        siteId=id,
+        enabledChannels=enabledChannels,
+        customNames=customNames,
+    )
 
 
 @app.route("/site/save", methods=["POST"])
 @authorise
 def saveSite():
     global config
+
     siteId = request.form["siteId"]
     enabledEdits = json.loads(request.form["enabledEdits"])
+    nameEdits = json.loads(request.form["nameEdits"])
 
-    enabledChannels = list(config["sites"].get(
-        siteId, {}).get("enabled channels", []))
+    enabledChannels = config["sites"].get(siteId, {}).get("enabled channels", [])
+    customNames = config["sites"].get(siteId, {}).get("custom names", {})
 
     for edit in enabledEdits:
         if edit["enabled"]:
             enabledChannels.append(edit["channel id"])
         else:
-            enabledChannels = list(
-                filter((edit["channel id"]).__ne__, enabledChannels))
+            enabledChannels = list(filter((edit["channel id"]).__ne__, enabledChannels))
+
+    for edit in nameEdits:
+        channelId = edit["channel id"]
+        CustomName = edit["custom name"]
+        if CustomName != "":
+            customNames[channelId] = CustomName
+        else:
+            customNames.pop(channelId, None)
 
     config["sites"].setdefault(siteId, {})
-
-    if len(enabledChannels) == 0:
-        #config["sites"].pop(siteId, None)
-        del config["sites"][siteId]
-    else:
-        config["sites"][siteId]["enabled channels"] = sorted(enabledChannels)
+    config["sites"][siteId]["enabled channels"] = sorted(enabledChannels)
+    config["sites"][siteId]["custom names"] = dict(sorted(customNames.items()))
 
     with open(configFile, "w") as f:
         json.dump(config, f, indent=4)
 
     logger.info("{} config saved!".format(siteId))
-    flash("{} Config Saved!".format(siteId), 'success')
+    flash("{} Config Saved!".format(siteId), "success")
 
-    return redirect("/sites", code=302)
+    return redirect("/site/" + siteId, code=302)
+
+
+@app.route("/site/reset", methods=["POST"])
+@authorise
+def resetSite():
+    global config
+
+    siteId = request.form["siteId"]
+
+    config["sites"].setdefault(siteId, {})
+    config["sites"][siteId]["enabled channels"] = []
+    config["sites"][siteId]["custom names"] = {}
+
+    with open(configFile, "w") as f:
+        json.dump(config, f, indent=4)
+
+    logger.info("{} config Reset!".format(siteId))
+    flash("{} Config Reset!".format(siteId), "success")
+
+    return redirect("/site/" + siteId, code=302)
 
 
 @app.route("/settings", methods=["GET"])
 @authorise
 def settings():
     settings = config["settings"]
-    nextUpdate = str(schedulerId).split('at: ')[1].rstrip(')')
-    return render_template("settings.html", settings=settings, nextUpdate=nextUpdate, languages=languages, hours=hours)
+    nextUpdate = str(schedulerId).split("at: ")[1].rstrip(")")
+    return render_template(
+        "settings.html",
+        settings=settings,
+        nextUpdate=nextUpdate,
+        languages=languages,
+        hours=hours,
+    )
 
 
 @app.route("/settings/save", methods=["POST"])
@@ -443,16 +681,16 @@ def saveSettings():
         "update hour": updateHour,
         "security": security,
         "username": username,
-        "password": password
+        "password": password,
     }
 
     with open(configFile, "w") as f:
         json.dump(config, f, indent=4)
 
-    schedulerId.reschedule('cron', hour=updateHour)
+    schedulerId.reschedule("cron", hour=updateHour)
 
     logger.info("Settings saved!")
-    flash("Settings Saved!", 'success')
+    flash("Settings Saved!", "success")
 
     return redirect("/settings", code=302)
 
@@ -474,7 +712,7 @@ def xmltv():
 def updateXmltv():
     makeXmltv()
 
-    flash("XMLTV Recreated!", 'success')
+    flash("XMLTV Recreated!", "success")
 
     return redirect("/settings", code=302)
 
@@ -483,9 +721,9 @@ def updateXmltv():
 @authorise
 def update():
     if updateGrabbers() == 0:
-        flash("Grabbers Updated!", 'success')
+        flash("Grabbers Updated!", "success")
     else:
-        flash("Updating grabbers failed!", 'danger')
+        flash("Updating grabbers failed!", "danger")
 
     return redirect("/sites", code=302)
 
@@ -499,7 +737,7 @@ def log():
 @app.route("/log/stream", methods=["GET"])
 @authorise
 def stream():
-    with open('EPG-Monkey.log') as f:
+    with open("EPG-Monkey.log") as f:
         log = f.read()
     return log
 
@@ -509,7 +747,8 @@ if __name__ == "__main__":
 
     scheduler = BackgroundScheduler(daemon=True)
     schedulerId = scheduler.add_job(
-        makeXmltv, 'cron', hour=config.get("settings", {}).get("update hour", 0))
+        makeXmltv, "cron", hour=config.get("settings", {}).get("update hour", 0)
+    )
     scheduler.start()
 
     app.run(host="0.0.0.0", port=8001, debug=False)
