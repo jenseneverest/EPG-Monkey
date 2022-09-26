@@ -39,7 +39,7 @@ This is simply a GUI, scheduler, translator, combiner, server for the grabbers t
 # Screenshots
 ![image](https://user-images.githubusercontent.com/5328818/192340712-21187930-7681-48f5-8443-e4891f75d1c6.png)
 ![image](https://user-images.githubusercontent.com/5328818/192341236-ea7f38d7-a50e-4253-be1b-e1405597d525.png)
-![image](https://user-images.githubusercontent.com/5328818/192341451-6f4d29f3-d64f-48ed-b5e2-4c2cb7585562.png)
+![image](https://user-images.githubusercontent.com/5328818/192341911-a0e29ca3-07c2-42b1-b717-f1c8d33a654d.png)
 ![image](https://user-images.githubusercontent.com/5328818/192341512-e20de1fe-ad48-4c58-aef2-f569e119a91b.png)
 
 
