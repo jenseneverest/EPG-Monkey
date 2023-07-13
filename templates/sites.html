@@ -5,22 +5,17 @@
     <table id="table" class="table table-striped table-dark nowrap" style="display:none; width:100%">
         <thead>
             <tr>
-                <th>Country</th>
                 <th>Site</th>
                 <th>Channels</th>
                 <th>Enabled Channels</th>
                 <th>Edit</th>
-                <th></th>
             </tr>
         </thead>
         <tbody>
             {% for site in sites %}
             <tr class="align-middle">
                 <td>
-                    {{ sites[site]["country"] }}
-                </td>
-                <td>
-                    {{ sites[site]["site"] }}
+                    {{ site }}
                 </td>
                 <td>
                     {{ sites[site]["channels"]|length }}
@@ -32,9 +27,6 @@
                     <a href='/site/{{ site }}'><button class="btn btn-success btn-block"><i
                                 class="fa fa-pencil"></i></button></a>
                 </td>
-                <td>
-                    {{ sites[site]["channels"] }}
-                </td>
             </tr>
             {% endfor %}
         </tbody>
@@ -44,20 +36,22 @@
 <script>
     $(document).ready(function () {
         var table = $('#table').DataTable({
-            order: [[3, 'des'], [0, 'asc']],
+            order: [[2, 'des'], [0, 'asc']],
             dom: "<'row m-1'<'col-auto'B><'col-auto ms-auto'f>>",
             ordering: true,
             paging: false,
             bFilter: true,
             bInfo: false,
             columnDefs: [
-                { targets: 5, visible: false },
-                { targets: 4, orderable: false, searchable: false },
+            { targets: 1, searchable: false },
+            { targets: 2, searchable: false },
+            { targets: 3, orderable: false, searchable: false },
             ],
             language: {
                 search: "",
                 searchPlaceholder: 'Filter',
                 lengthMenu: "_MENU_",
+                emptyTable: "No grabbers found. Try updating grabbers."
             },
             buttons: {
                 buttons: [

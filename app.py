@@ -11,7 +11,6 @@ import xml.etree.cElementTree as ET
 import os
 import json
 import concurrent.futures
-import requests
 from deep_translator import GoogleTranslator
 from functools import wraps
 import secrets
@@ -19,9 +18,8 @@ from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 import string
 import subprocess
-import zipfile
-import io
 import logging
+import platform
 
 app = Flask(__name__)
 app.secret_key = secrets.token_urlsafe(32)
@@ -46,9 +44,16 @@ else:
 
 configFile = os.path.join(configDir, "config.json")
 xmlFile = os.path.join(configDir, "tv.xml")
-grabberDir = os.path.join(basePath, "epg-master")
+grabberDir = os.path.join(basePath, "grabbers")
 sitesDir = os.path.join(grabberDir, "sites")
 tmpDir = os.path.join(basePath, "tmp")
+windows = platform.system() == "Windows"
+
+if not os.path.exists(tmpDir):
+    os.makedirs(tmpDir)
+
+if not os.path.exists(grabberDir):
+    os.makedirs(grabberDir)
 
 languages = {
     "afrikaans": "af",
@@ -219,30 +224,60 @@ def authorise(f):
 def updateGrabbers():
     logger.info("Updating Grabbers...")
 
-    r = requests.get("https://github.com/iptv-org/epg/archive/refs/heads/master.zip")
-    z = zipfile.ZipFile(io.BytesIO(r.content))
-    z.extractall(basePath)
-    ret = subprocess.call(
-        ["npm", "install"],
-        cwd=grabberDir,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+    clonecmd = [
+        "git",
+        "clone",
+        "--depth",
+        "1",
+        "-b",
+        "master",
+        "https://github.com/iptv-org/epg.git",
+        ".",
+    ]
 
-    if ret == 0:
+    pullcmd = ["git", "pull"]
+
+    installcmd = ["npm", "install"]
+
+    if len(os.listdir(grabberDir)) == 0:
+        r = subprocess.call(
+            clonecmd,
+            cwd=grabberDir,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    else:
+        r = subprocess.call(
+            pullcmd,
+            cwd=grabberDir,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+
+    if r == 0:
+        r = subprocess.call(
+            installcmd,
+            cwd=grabberDir,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            shell=windows,
+        )
+
+    if r == 0:
         logger.info("Grabbers updated!")
     else:
         logger.info("Updating Grabbers Failed!")
 
-    return ret
+    return r
 
 
 def getGrabbers():
     def getData(xml):
         path = xml
-        id = os.path.basename(xml).split(".channels")[0]
-        site = os.path.basename(xml).split("_")[0]
-        country = xml.split("_")[1].split(".c")[0].upper()
+        id = os.path.basename(xml).replace(".channels.xml", "")
         channels = []
 
         tree = ET.parse(path)
@@ -253,26 +288,29 @@ def getGrabbers():
             xmltv_id = channel.attrib["xmltv_id"]
             channels.append({"name": name, "lang": lang, "xmltv_id": xmltv_id})
 
-        data = {
-            id: {"path": path, "site": site, "country": country, "channels": channels}
-        }
+        data = {id: {"path": path, "channels": channels}}
 
-        grabbers.update(data)
+        return data
 
     if not os.path.exists(grabberDir):
         updateGrabbers()
 
     xmls = []
 
-    for r, d, f in os.walk(sitesDir):
-        for file in f:
-            if ".channels.xml" in file:
-                xmls.append(os.path.join(r, file))
+    for root, dirnames, filenames in os.walk(sitesDir):
+        for filename in filenames:
+            if filename.endswith(".channels.xml"):
+                xmls.append(os.path.join(root, filename))
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        results = executor.map(getData, xmls)
 
     grabbers = {}
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        executor.map(getData, xmls)
+    for result in results:
+        grabbers.update(result)
+
+    json.dumps(grabbers, indent=4)
 
     return grabbers
 
@@ -393,10 +431,6 @@ def makeXmltv():
         tree.write(tmpChannels)
 
         if os.path.exists(tmpChannels):
-
-            # subprocess.call(["npx", "epg-grabber", "--days=" + str(days), "--config=" + conf, "--channels=" + tmpChannels,
-            #                "--output=" + output], shell=True, cwd=grabberDir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
             with subprocess.Popen(
                 [
                     "npx",
@@ -409,9 +443,10 @@ def makeXmltv():
                 cwd=grabberDir,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL,
+                shell=windows,
             ) as grab:
                 for line in iter(grab.stdout.readline, ""):
-                    line = line.decode("unicode-escape")
+                    line = line.decode("utf-8")
                     if line.startswith("["):
                         logger.info(line.rstrip())
                     if grab.poll() is not None:
@@ -751,4 +786,4 @@ if __name__ == "__main__":
     )
     scheduler.start()
 
-    app.run(host="0.0.0.0", port=8001, debug=False)
+    app.run(host="0.0.0.0", port=8001, debug=True)
