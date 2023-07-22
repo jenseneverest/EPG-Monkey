@@ -27,6 +27,9 @@
                     <a href='/site/{{ site }}'><button class="btn btn-success btn-block"><i
                                 class="fa fa-pencil"></i></button></a>
                 </td>
+                <td>
+                    {{ sites[site]["channels"] }}
+                </td>
             </tr>
             {% endfor %}
         </tbody>
@@ -43,9 +46,10 @@
             bFilter: true,
             bInfo: false,
             columnDefs: [
-            { targets: 1, searchable: false },
-            { targets: 2, searchable: false },
-            { targets: 3, orderable: false, searchable: false },
+                { targets: 1, searchable: false },
+                { targets: 2, searchable: false },
+                { targets: 3, searchable: false, orderable: false },
+                { targets: 4, visible: false },
             ],
             language: {
                 search: "",
