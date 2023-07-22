@@ -24,5 +24,6 @@ chris230291/epg-monkey:latest
 
 After creating the Docker container find the web UI @ `<Docker Host IP>:<Port>`
 
+# Support
 Any grabber issues should be directed to the guys over at [iptv-org](https://github.com/iptv-org/epg).
 This is simply a GUI, scheduler, translator, combiner, server for the grabbers they maintain.
