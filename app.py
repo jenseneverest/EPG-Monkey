@@ -20,6 +20,7 @@ import string
 import subprocess
 import logging
 import platform
+import threading
 
 app = Flask(__name__)
 app.secret_key = secrets.token_urlsafe(32)
@@ -745,9 +746,9 @@ def xmltv():
 @app.route("/update/xmltv", methods=["GET"])
 @authorise
 def updateXmltv():
-    makeXmltv()
+    threading.Thread(target=makeXmltv).start()
 
-    flash("XMLTV Recreated!", "success")
+    flash("Recreating XMLTV", "success")
 
     return redirect("/settings", code=302)
 
