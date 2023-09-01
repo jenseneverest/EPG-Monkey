@@ -236,6 +236,7 @@ def updateGrabbers():
         ".",
     ]
 
+    resetcmd = ["git", "reset", "--hard"]
     pullcmd = ["git", "pull"]
 
     installcmd = ["npm", "install"]
@@ -249,6 +250,13 @@ def updateGrabbers():
             stderr=subprocess.DEVNULL,
         )
     else:
+        subprocess.call(
+            resetcmd,
+            cwd=grabberDir,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
         r = subprocess.call(
             pullcmd,
             cwd=grabberDir,
